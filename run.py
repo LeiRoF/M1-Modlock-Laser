@@ -8,33 +8,47 @@ with open("config.yml", 'r') as stream:
     config=yaml.safe_load(stream)
     print(config)
 
+def gauss(v,m,s):
+    return 1/(s*sqrt(2*pi))*exp(-0.5*((v-m)/s)**2)  # gaussian distribution
+
+fmin = config['fmin']
+fgap = config['fgap']
+mods = config['mods']
+tmp = 0
+while tmp < fmin or tmp == 0:
+    tmp += fgap
+
+
 v = arange(config['min'], config['max'], config['freq_gap'])
 
 x = linspace(0, config['cavity_lenght'],1000, endpoint=True)
 
 c = 3e8
 
-mods = arange(33)+1
+mods = arange(100)+1
 periods = []
 phases = []
 amplitudes = []
 tmax = 1
+
 for i in mods:
     periods.append(1/i)#random())
     phases.append(0)#random()*2*pi)
-    amplitudes.append(1)
+    amplitudes.append(sqrt(i))
 periods = array(periods)
 
 t = linspace(0,max(periods)*2,1000)
 
 # waves definition
 def wave(mod,x,t):
-    return amplitudes[mod-1]*sin(x/config['cavity_lenght']*pi*mod)*cos(2*pi*t/periods[mod-1] + phases[mod-1])
+    return amplitudes[mod-1]                        \
+        *sin(x/config['cavity_lenght']*pi*mod)      \
+        *cos(2*pi*t/periods[mod-1] + phases[mod-1])
 
 # Init plot
 fig, (ax1, ax2) = plt.subplots(2,1)
-ax1.set_ylim(-1, 1)
-ax2.set_ylim(-len(mods), len(mods))
+ax1.set_ylim(-max(amplitudes[:10]), max(amplitudes[:10]))
+ax2.set_ylim(-1, 1)
 for ax in [ax1,ax2]:
     ax.set_xlim(0,config['cavity_lenght'])
     ax.grid()
@@ -44,7 +58,7 @@ total = zeros(len(x))
 lines = []
 for i in mods:
     w = wave(i,x,0)
-    lines.append(ax1.plot(x,w,label=f"mod {i}")[0])
+    if i<10: lines.append(ax1.plot(x,w,label=f"mod {i}")[0])
     total += w
 line_tot, = ax2.plot(x, total)
 
@@ -53,9 +67,9 @@ def run(T):
     total = zeros(len(x))
     for i in mods:
         w = wave(i,x,T)
-        lines[i-1].set_data(x,w)
+        if i<10: lines[i-1].set_data(x,w)
         total += w
-    line_tot.set_data(x,total)
+    line_tot.set_data(x,total/max(abs(total)))
 
     return lines + [line_tot]
 

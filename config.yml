@@ -1,5 +1,4 @@
-freq_gap : 1
-laser_gain_distrib : "gauss(v,5,1)" # will be evaluated by python with "v" as the frequency. Numpy is importad without prefix (sqrt() -> numpy.sqrt())
-min: 1
-max: 100
-cavity_lenght: 100
+fgap : 1 # frequency gap (also define the lenght of the cavity)
+fmin : 0 # starting mod
+mods : 100 # number of mods
+laser_gain_distrib : "gauss(v,50,10)" # will be evaluated by python with "v" as the frequency. Numpy is importad without prefix (sqrt() -> numpy.sqrt())
