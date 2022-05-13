@@ -62,22 +62,32 @@ ax3.bar(v,amplitudes)
 ax3.plot(v,gain_distrib(v),'r--')
 
 # First plot at t=0
+
+ax1.vlines(x=mods_freq, ymin=0, ymax=amplitudes, color='b')
+ax1.plot(v,gain_distrib(v))
+
 total = zeros(len(x))
 lines = []
 for i in arange(mods)+1:
     w = wave(i,x,0)
-    if i<10: lines.append(ax1.plot(x,w,label=f"mod {i}")[0])
+    if i<10: lines.append(ax2.plot(x,w,label=f"mod {i}")[0])
     total += w
-line_tot, = ax2.plot(x, total)
+line_tot, = ax3.plot(x, total)
+
 
 # Plotting for a given time
 def run(T):
+    global amplitudes
     total = zeros(len(x))
     for i in arange(mods)+1:
         w = wave(i,x,T)
         if i<10: lines[i-1].set_data(x,w)
         total += w
     line_tot.set_data(x,total/max(abs(total)))
+    ax.text(0.5, 1.100, f"y=sin(x), frame: {round(T,3)}s",
+            bbox={'facecolor': 'red', 'alpha': 0.5, 'pad': 5},
+            transform=ax.transAxes, ha="center")
+    # ttl.set_text(f"Total normalized (Max intensity = {max(abs(total))})")
 
     return lines + [line_tot]
 
