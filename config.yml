@@ -1,4 +1,4 @@
 fgap : 1 # frequency gap [Hz] (also define the lenght of the cavity)
 fmin : 0 # starting mod [Hz]
-mods : 100 # number of mods
+mods : 33 # number of mods
 gain_distrib : "gauss(v,50,10)" # will be evaluated by python with "v" as the frequency. Numpy is importad without prefix (sqrt() -> numpy.sqrt())

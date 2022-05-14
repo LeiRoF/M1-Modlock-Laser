@@ -51,20 +51,14 @@ def wave(mod,x,t):
         *cos(2*pi*t/periods[mod-1] + phases[mod-1])
 
 # Init plot
-fig, (ax3, ax1, ax2) = plt.subplots(3,1)
-ax1.set_ylim(-max(amplitudes[:10]), max(amplitudes[:10]))
-ax2.set_ylim(-1, 1)
-for ax in [ax1,ax2]:
+fig, (ax1, ax2, ax3) = plt.subplots(3,1)
+for ax in [ax2,ax3]:
+    ax.set_ylim(-1, 1)
     ax.set_xlim(0,cavity_lenght)
     ax.grid()
 
-ax3.bar(v,amplitudes)
-ax3.plot(v,gain_distrib(v),'r--')
-
-# First plot at t=0
-
-ax1.vlines(x=mods_freq, ymin=0, ymax=amplitudes, color='b')
-ax1.plot(v,gain_distrib(v))
+ax1.bar(v,amplitudes)
+ax1.plot(v,gain_distrib(v),'r--')
 
 total = zeros(len(x))
 lines = []
@@ -72,7 +66,7 @@ for i in arange(mods)+1:
     w = wave(i,x,0)
     if i<10: lines.append(ax2.plot(x,w,label=f"mod {i}")[0])
     total += w
-line_tot, = ax3.plot(x, total)
+line_tot, = ax3.plot(x, total/max(abs(total)), label="Total")
 
 
 # Plotting for a given time
@@ -84,9 +78,6 @@ def run(T):
         if i<10: lines[i-1].set_data(x,w)
         total += w
     line_tot.set_data(x,total/max(abs(total)))
-    ax.text(0.5, 1.100, f"y=sin(x), frame: {round(T,3)}s",
-            bbox={'facecolor': 'red', 'alpha': 0.5, 'pad': 5},
-            transform=ax.transAxes, ha="center")
     # ttl.set_text(f"Total normalized (Max intensity = {max(abs(total))})")
 
     return lines + [line_tot]
