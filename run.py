@@ -1,3 +1,5 @@
+from cProfile import label
+from tkinter import Label
 import yaml
 from numpy import *
 import matplotlib.pyplot as plt
@@ -17,7 +19,8 @@ def gain_distrib(v):
 
 fmin = config['fmin']
 fgap = config['fgap']
-mods = config['mods']
+modes = config['modes']
+dispMax = min(modes,config['display_modes'])
 c = 3e8
 cavity_lenght = c/fgap
 
@@ -26,7 +29,7 @@ while tmp < fmin or tmp == 0:
     tmp += fgap
 
 
-v = arange(fmin, fmin+fgap*mods, fgap)
+v = arange(fmin, fmin+fgap*modes, fgap)
 x = linspace(0, cavity_lenght,1000, endpoint=True)
 
 periods = []
@@ -34,13 +37,14 @@ phases = []
 amplitudes = []
 tmax = 1
 
-for i in arange(mods)+1:
-    periods.append(1/i)#random())
-    phases.append(0)#random()*2*pi)
+for i in arange(modes)+1:
+    periods.append(v[i-1])#/i)#random())
+    phases.append(random()*2*pi)
     amplitudes.append(1)#sqrt(i))
 periods = array(periods)
 amplitudes = array(amplitudes)
 amplitudes = amplitudes/max(amplitudes)
+phases = array(phases)
 
 t = linspace(0,max(periods)*2,1000)
 
@@ -52,38 +56,64 @@ def wave(mod,x,t):
 
 # Init plot
 fig, (ax1, ax2, ax3) = plt.subplots(3,1)
-for ax in [ax2,ax3]:
-    ax.set_ylim(-1, 1)
-    ax.set_xlim(0,cavity_lenght)
-    ax.grid()
 
-ax1.bar(v,amplitudes)
-ax1.plot(v,gain_distrib(v),'r--')
+
+# ax1.vlines(x=v,ymin=0,ymax=amplitudes/max(amplitudes))
+lines1 = []
+for i in v: ax1.axvline(i, color='k', linestyle='--')
+lines1.append(ax1.plot(  v,  gain_distrib(v) /max(gain_distrib(v)),  c='0.55',  label=f"Laser gain (*{round(max(gain_distrib(v)),3)})"    ))
+lines1.append(ax1.plot(  v,  amplitudes      /max(amplitudes),       'y',       label=f"Amplitudes (*{round(max(amplitudes),3)})"        ))
+lines1.append(ax1.plot(  v,  phases%(2*pi)   /(2*pi),                'g',       label='Phases (*2*Pi)'                                  ))
+lines1.append(ax1.plot(  v,  periods         /max(abs(periods)),     'b',       label=f"Periods (*{round(max(abs(periods)),3)})"         ))
+
+ax1.set_ylim(0,1)
+ax1.grid()
+ax1.legend()
+ax1.set_title("Laser parameters",loc='left')
+ax1.set_xlabel("Frequency (Hz)")
+ax1.set_ylabel("Normalized Gain/Amplitude/Phase/Period")
 
 total = zeros(len(x))
 lines = []
-for i in arange(mods)+1:
+for i in arange(modes)+1:
     w = wave(i,x,0)
-    if i<10: lines.append(ax2.plot(x,w,label=f"mod {i}")[0])
+    if i<=dispMax: lines.append(ax2.plot(x,w,label=f"mod {i}")[0])
     total += w
-line_tot, = ax3.plot(x, total/max(abs(total)), label="Total")
+line_tot, = ax3.plot(x, zeros(len(x)), label="Total")
 
+ax2.set_ylim(-max(amplitudes[:dispMax]), max(amplitudes[:dispMax]))
+ax3.set_ylim(-sum(amplitudes), sum(amplitudes))
+ax2.set_title("Laser waves",loc='left')
+ax3.set_title("Sum of waves",loc='left')
+ax2.set_ylim(-max(amplitudes[:dispMax]), max(amplitudes[:dispMax]))
+for ax in [ax2,ax3]:
+    ax.set_xlim(0,cavity_lenght)
+    ax.grid()
+    ax.set_xlabel("Distance (m)")
+    ax.set_ylabel("Amplitude")
+
+
+im3, = ax3.plot([], [], color=(0,0,1))
 
 # Plotting for a given time
 def run(T):
     global amplitudes
+    print(f"Progress: {round(T/t[-1]*100,2)} %",end="\r")
+
     total = zeros(len(x))
-    for i in arange(mods)+1:
+    
+    for i in arange(modes)+1:
         w = wave(i,x,T)
-        if i<10: lines[i-1].set_data(x,w)
         total += w
-    line_tot.set_data(x,total/max(abs(total)))
-    # ttl.set_text(f"Total normalized (Max intensity = {max(abs(total))})")
+
+        if i<=dispMax:
+            lines[i-1].set_data(x,w)
+    line_tot.set_data(x,total)
 
     return lines + [line_tot]
 
 ani = animation.FuncAnimation(fig, run, t, blit=True, interval=10,
     repeat=True)
-#ax1.legend()
+
 ani.save(f"result.mp4")
 plt.show()
