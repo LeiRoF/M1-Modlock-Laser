@@ -1,6 +1,11 @@
-fgap : 1 # frequency gap [Hz] (also define the lenght of the cavity)
-fmin : 0 # starting mod [Hz]
-modes : 30 # number of modes
-gain_distrib : "gauss(v,50,10)" # will be evaluated by python with "v" as the frequency. Numpy is importad without prefix (sqrt() -> numpy.sqrt())
-
+fgap : 1          # frequency gap [Hz] (also define the lenght of the cavity)
+modes : 100       # number of modes
 display_modes: 10
+
+# The following parameters will be evaluated by python with "i" as the mode number and "v" as the frequency of the mode i.
+# /!\ Modes are starting from 1 and goes to modes
+# Numpy is imported without prefix (numpy.sqrt() -> sqrt())
+phase_distrib:     "0"
+amplitude_distrib: "1"              # arbitrary unit
+period_distrib:    "1/i"            # in Hz
+gain_distrib :     "gauss(v,50,20)" # arbitrary unit
