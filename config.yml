@@ -7,5 +7,4 @@ display_modes: 10
 # Numpy is imported without prefix (numpy.sqrt() -> sqrt())
 phase_distrib:     "0"
 amplitude_distrib: "1"              # arbitrary unit
-period_distrib:    "1/i"            # in Hz
 gain_distrib :     "gauss(v,50,20)" # arbitrary unit

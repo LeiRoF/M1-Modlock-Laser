@@ -39,7 +39,6 @@ def wave(mode,x,t):
                                                          
 """
 
-def period_distrib(i,v):    return eval(config['period_distrib'   ])
 def phase_distrib(i,v):     return eval(config['phase_distrib'    ])
 def amplitude_distrib(i,v): return eval(config['amplitude_distrib'])
 def gain_distrib(i,v):      return eval(config['gain_distrib'     ])
@@ -53,19 +52,17 @@ cavity_lenght = c/fgap
 
 v = arange(fgap, fgap*(modes+1), fgap)
 x = linspace(0, cavity_lenght,1000, endpoint=True)
+t = linspace(0,max(1/v)*2,1000)
 
-periods    = []
 phases     = []
 amplitudes = []
 gain       = []
 
 for i in arange(modes):
-    periods.append(period_distrib(i+1, v[i]))
     phases.append(phase_distrib(i+1, v[i]))
     amplitudes.append(amplitude_distrib(i+1, v[i]))
     gain.append(gain_distrib(i+1, v[i]))
 
-periods                  = array(periods)
 amplitudes               = array(amplitudes)
 amplitudes               = amplitudes/max(amplitudes)
 phases                   = array(phases)
@@ -74,8 +71,6 @@ gain[gain > max(gain)/2] = max(gain)/2
 
 initial_amplitudes = copy(amplitudes)
 amplitudes *= gain
-
-t = linspace(0,max(periods)*2,1000)
 
 print("🧮 Computing...")
 total_evol = []
@@ -118,7 +113,6 @@ ax1.vlines(v[0],ymin=0,ymax=amplitudes[0]/max(amplitudes), color='r', label=f"Mo
 for i in range(modes)[1:]: ax1.vlines(v[i],ymin=0,ymax=amplitudes[i]/max(amplitudes), color='r')
 lines1.append(ax1.plot(  v,  initial_amplitudes   /max(initial_amplitudes), 'y',       label=f"Initial modes amplitudes (*{round(max(initial_amplitudes),3)})" ))
 lines1.append(ax1.plot(  v,  phases%(2*pi)        /(2*pi),                  'g',       label='Phases (*2*Pi)'                                                  ))
-lines1.append(ax1.plot(  v,  periods              /max(abs(periods)),       'b',       label=f"Periods (*{round(max(abs(periods)),3)})"                        ))
 
 #  Plot properties
 ax1.set_ylim(ymin=0)
