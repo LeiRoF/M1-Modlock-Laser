@@ -1,10 +1,12 @@
 fgap : 1          # frequency gap [Hz] (also define the lenght of the cavity)
-modes : 100       # number of modes
+modes : 30       # number of modes
 display_modes: 10
+fixed_total_intensity: True # allow to study the influence of the gain, aplitudes and number of modes on the pulse intensity.
+# Thus, only the shape of the distribution will be conserved for the following 'amplitude_distrib' and 'gain_distrib'
 
-# The following parameters will be evaluated by python with "i" as the mode number and "v" as the frequency of the mode i.
+# The following parameters will be evaluated by python with "i" as the mode number and "v[i]" as the frequency of the mode i.
 # /!\ Modes are starting from 1 and goes to modes
 # Numpy is imported without prefix (numpy.sqrt() -> sqrt())
 phase_distrib:     "0"
-amplitude_distrib: "1"              # arbitrary unit
-gain_distrib :     "gauss(v,50,20)" # arbitrary unit
+amplitude_distrib: "1" # arbitrary unit
+gain_distrib :     "min(1/2,gauss(i,mean(v),std(v)))"

@@ -25,7 +25,7 @@ def gauss(v,m,s):
 def wave(mode,x,t):
     return (
         amplitudes[mode]                          # Amplitude
-        *sin(x/cavity_lenght*pi*mode)             # Space dependence
+        *sin(x/cavity_lenght*pi*(mode+1))             # Space dependence
         *exp(-1j*(t*2*pi*v[mode]+phases[mode]))   # Time dependence
     )
 
@@ -39,9 +39,9 @@ def wave(mode,x,t):
                                                          
 """
 
-def phase_distrib(i,v):     return eval(config['phase_distrib'    ])
-def amplitude_distrib(i,v): return eval(config['amplitude_distrib'])
-def gain_distrib(i,v):      return eval(config['gain_distrib'     ])
+def phase_distrib(i):     return eval(config['phase_distrib'    ])
+def amplitude_distrib(i): return eval(config['amplitude_distrib'])
+def gain_distrib(i):      return eval(config['gain_distrib'     ])
 
 fgap    = config['fgap']
 modes   = config['modes']
@@ -59,15 +59,18 @@ amplitudes = []
 gain       = []
 
 for i in arange(modes):
-    phases.append(phase_distrib(i+1, v[i]))
-    amplitudes.append(amplitude_distrib(i+1, v[i]))
-    gain.append(gain_distrib(i+1, v[i]))
+    phases.append(phase_distrib(i+1))
+    amplitudes.append(amplitude_distrib(i+1))
+    gain.append(gain_distrib(i+1))
 
 amplitudes               = array(amplitudes)
 amplitudes               = amplitudes/max(amplitudes)
 phases                   = array(phases)
 gain                     = array(gain)
-gain[gain > max(gain)/2] = max(gain)/2
+
+if config['fixed_total_intensity']:
+    amplitudes = amplitudes * 100 / sum(amplitudes)
+    gain = gain / mean(gain)
 
 initial_amplitudes = copy(amplitudes)
 amplitudes *= gain
@@ -108,7 +111,7 @@ fig, (ax1, ax2, ax3) = plt.subplots(3,1,figsize=(16,9))
 # __________________________________________________
 # First subplot : input data
 lines1 = []
-lines1.append(ax1.plot(  v,  gain /max(gain),  c='0.55',  label=f"Laser gain (*{round(max(gain),3)})"    ))
+lines1.append(ax1.plot(  v, gain /max(gain),  c='0.55',  label=f"Laser gain (*{round(max(gain),3)})"    ))
 ax1.vlines(v[0],ymin=0,ymax=amplitudes[0]/max(amplitudes), color='r', label=f"Modes (*{round(max(amplitudes),3)})")
 for i in range(modes)[1:]: ax1.vlines(v[i],ymin=0,ymax=amplitudes[i]/max(amplitudes), color='r')
 lines1.append(ax1.plot(  v,  initial_amplitudes   /max(initial_amplitudes), 'y',       label=f"Initial modes amplitudes (*{round(max(initial_amplitudes),3)})" ))
