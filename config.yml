@@ -7,6 +7,6 @@ fixed_total_intensity: True # allow to study the influence of the gain, aplitude
 # The following parameters will be evaluated by python with "i" as the mode number and "v[i]" as the frequency of the mode i.
 # /!\ Modes are starting from 1 and goes to modes
 # Numpy is imported without prefix (numpy.sqrt() -> sqrt())
-phase_distrib:     "0"
+phase_distrib:     "random()*2*pi"
 amplitude_distrib: "1" # arbitrary unit
-gain_distrib :     "min(1/2,gauss(i,mean(v),std(v)))"
+gain_distrib :     "min(1/2,gauss(i,mean(v),std(v)/2))"

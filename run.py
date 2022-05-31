@@ -93,7 +93,7 @@ total_evol = array(total_evol)
 
 real_max = amax(real(total_evol))
 abs_max = amax(abs(total_evol))
-print("  -> Maximum pulse intensity :",round(abs_max**2,2))
+print("  -> Maximum pulse amplitude :",round(real_max,2))
 
 """
   ____                        __ _          _      __                          
@@ -111,11 +111,11 @@ fig, (ax1, ax2, ax3) = plt.subplots(3,1,figsize=(16,9))
 # __________________________________________________
 # First subplot : input data
 lines1 = []
-lines1.append(ax1.plot(  v, gain /max(gain),  c='0.55',  label=f"Laser gain (*{round(max(gain),3)})"    ))
-ax1.vlines(v[0],ymin=0,ymax=amplitudes[0]/max(amplitudes), color='r', label=f"Modes (*{round(max(amplitudes),3)})")
+lines1.append(ax1.plot(  v, gain /max(gain),  c='0.55',  label=f"Laser gain (/{round(max(gain),3)})"    ))
+ax1.vlines(v[0],ymin=0,ymax=amplitudes[0]/max(amplitudes), color='r', label=f"Modes (/{round(max(amplitudes),3)})")
 for i in range(modes)[1:]: ax1.vlines(v[i],ymin=0,ymax=amplitudes[i]/max(amplitudes), color='r')
-lines1.append(ax1.plot(  v,  initial_amplitudes   /max(initial_amplitudes), 'y',       label=f"Initial modes amplitudes (*{round(max(initial_amplitudes),3)})" ))
-lines1.append(ax1.plot(  v,  phases%(2*pi)        /(2*pi),                  'g',       label='Phases (*2*Pi)'                                                  ))
+lines1.append(ax1.plot(  v,  initial_amplitudes   /max(initial_amplitudes), 'y',       label=f"Initial modes amplitudes (/{round(max(initial_amplitudes),3)})" ))
+lines1.append(ax1.plot(  v,  phases%(2*pi)        /(2*pi),                  'g',       label='Phases (/2*Pi)'                                                  ))
 
 #  Plot properties
 ax1.set_ylim(ymin=0)
@@ -134,14 +134,14 @@ for i in arange(modes):
     w = waves_evol[0][i]
     if i < dispMax: lines.append(ax2.plot(x,real(w)/max(amplitudes[:dispMax]),label=f"mode {i}")[0]) # Plot the 10 first modes
 total = total_evol[0]
-lines_tot.append(ax3.plot(x, real(total)/real_max,    label=f"Amplitude (real part) (*{round(real_max,2)})")[0])
-lines_tot.append(ax3.plot(x, (abs(total)/abs_max)**2, label=f"Instensity (*{round(real_max**2,2)})")[0])
+lines_tot.append(ax3.plot(x, real(total)/real_max,    label=f"Amplitude (real part) (/{round(real_max,2)})")[0])
+lines_tot.append(ax3.plot(x, (abs(total)/abs_max)**2, label=f"Instensity (/{round(real_max**2,2)})")[0])
 
 # Plot properties
 ax2.set_title("Laser waves",loc='left')
 ax3.set_title("Sum of waves",loc='left')
 ax3.legend()
-ax2.set_ylabel(f"Normalized amplitude (*{round(max(amplitudes[:dispMax]),2)})")
+ax2.set_ylabel(f"Normalized amplitude (/{round(max(amplitudes[:dispMax]),2)})")
 ax3.set_ylabel("Normalized amplitude")
 for ax in [ax2,ax3]:
     ax.set_ylim(-1,1)
